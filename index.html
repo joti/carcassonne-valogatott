@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Magyar Carcassonne válogatott</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 32px;
+      color: #111827;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    .year {
+      margin-top: 32px;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .matches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+	  transition: transform 0.15s ease;
+    }
+	
+	.card:hover {
+	  transform: translateY(-3px);
+	}
+	
+	.card-vb {
+	  border-top: 6px solid #2563eb;
+	}
+
+	.card-eb {
+      border-top: 6px solid #80c0d0;
+	}
+
+	.card-friendly {
+	  border-top: 6px solid #d1d5db;
+	}	
+	
+    .opponent {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .meta {
+      color: #6b7280;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .score {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 14px 0;
+    }
+
+    .win { color: #15803d; }
+    .loss { color: #dc2626; }
+    .draw { color: #ca8a04; }
+
+    .duel {
+      display: grid;
+	  grid-template-columns: minmax(0, 0.9fr) 28px minmax(0, 0.9fr);
+      gap: 5px;
+      align-items: center;
+      font-size: 12px;
+      margin: 4px 0;
+    }
+
+	.player {
+	  padding: 4px 5px;
+	  border-radius: 5px;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	}
+
+    .player-win {
+      background: #dcfce7;
+    }
+
+    .player-loss {
+      background: #fee2e2;
+    }
+
+    .duel-score {
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Magyar Carcassonne válogatott</h1>
+  <div class="subtitle">Hivatalos mérkőzések eredményei</div>
+
+  <div id="app">Betöltés...</div>
+
+  <script>
+    const app = document.getElementById("app");
+
+    function groupData(rows) {
+      const years = {};
+
+      rows.forEach(row => {
+        const year = row.year;
+        const matchKey = `${row.year}-${row.match_no}`;
+
+        if (!years[year]) years[year] = {};
+
+        if (!years[year][matchKey]) {
+          years[year][matchKey] = {
+            year: row.year,
+            match_no: row.match_no,
+            competition: row.competition,
+            date: row.date,
+            opponent: row.opponent,
+            match_hu: Number(row.match_hu),
+            match_opp: Number(row.match_opp),
+            duels: []
+          };
+        }
+
+        years[year][matchKey].duels.push({
+          duel_no: Number(row.duel_no),
+          hu_player: row.hu_player,
+          hu_score: Number(row.hu_score),
+          opp_score: Number(row.opp_score),
+          opp_player: row.opp_player
+        });
+      });
+
+      return years;
+    }
+
+	function competitionLabel(code) {
+	  if (code === "vb") return "WTCOC";
+	  if (code === "Eb") return "ETCOC";
+      if (code === "-") return "Barátságos mérkőzés";
+      return code;
+	}
+
+	function formatDate(year, shortDate) {
+
+	  const months = [
+		"jan.",
+		"febr.",
+		"márc.",
+		"ápr.",
+		"máj.",
+		"jún.",
+		"júl.",
+		"aug.",
+		"szept.",
+		"okt.",
+		"nov.",
+		"dec."
+	  ];
+
+	  const parts = shortDate.split(".");
+
+	  const month = Number(parts[0]);
+	  const day = Number(parts[1]);
+
+	  return `${year}. ${months[month - 1]} ${day}.`;
+	}
+	
+    function resultClass(match) {
+      if (match.match_hu > match.match_opp) return "win";
+      if (match.match_hu < match.match_opp) return "loss";
+      return "draw";
+    }
+
+    function render(years) {
+      app.innerHTML = "";
+
+      Object.keys(years).sort((a, b) => b - a).forEach(year => {
+        const yearBlock = document.createElement("section");
+
+        const matches = Object.values(years[year])
+          .sort((a, b) => Number(b.match_no) - Number(a.match_no));
+
+        yearBlock.innerHTML = `<div class="year">${year}</div>`;
+
+        const matchesDiv = document.createElement("div");
+        matchesDiv.className = "matches";
+
+        matches.forEach(match => {
+          const duelsHtml = match.duels
+            .sort((a, b) => a.duel_no - b.duel_no)
+            .map(duel => {
+              const huWon = duel.hu_score > duel.opp_score;
+
+              return `
+                <div class="duel">
+                  <div class="player ${huWon ? "player-win" : "player-loss"}">${duel.hu_player}</div>
+                  <div class="duel-score">${duel.hu_score}–${duel.opp_score}</div>
+                  <div>${duel.opp_player}</div>
+                </div>
+              `;
+            })
+            .join("");
+
+          const card = document.createElement("article");
+		  
+	  	  let competitionClass = "card-friendly";
+
+		  if (match.competition === "vb") {
+		    competitionClass = "card-vb";
+		  }
+
+		  if (match.competition === "Eb") {
+		    competitionClass = "card-eb";
+		  }
+
+		  card.className = `card ${competitionClass}`;		  
+
+          card.innerHTML = `
+            <div class="opponent">${match.opponent}</div>
+            <div class="meta">${formatDate(match.year, match.date)} · ${competitionLabel(match.competition)}</div>
+            <div class="score ${resultClass(match)}">${match.match_hu} – ${match.match_opp}</div>
+            ${duelsHtml}
+          `;
+
+          matchesDiv.appendChild(card);
+        });
+
+        yearBlock.appendChild(matchesDiv);
+        app.appendChild(yearBlock);
+      });
+    }
+
+    window.handleSheetData = function(response) {
+      try {
+        const cols = response.table.cols.map(col => col.label);
+
+        const rows = response.table.rows.map(r => {
+          const obj = {};
+
+          cols.forEach((col, i) => {
+            obj[col] =
+              r.c[i] && r.c[i].v !== null
+                ? String(r.c[i].v).trim()
+                : "";
+          });
+
+          return obj;
+        });
+
+        render(groupData(rows));
+      } catch (e) {
+        app.innerHTML = "Hiba feldolgozás közben:<br><pre>" + e.message + "</pre>";
+      }
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://docs.google.com/spreadsheets/d/1Ni_NBunNrlJ1RNkNGH8R64w_Jjy0N3gFB2YNi4DfX6w/gviz/tq?gid=2102518483&tqx=out:json;responseHandler:handleSheetData";
+
+    script.onerror = function() {
+      app.innerHTML = "Nem sikerült betölteni a Google Sheet adatokat.";
+    };
+
+    document.body.appendChild(script);
+  </script>
+
+</body>
+</html>
