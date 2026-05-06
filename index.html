@@ -8,7 +8,8 @@
       font-family: Arial, sans-serif;
       background: #f5f7fa;
       margin: 0;
-      padding: 32px;
+      padding: 24px;
+      padding-top: 12px;
       color: #111827;
     }
 
@@ -23,15 +24,34 @@
 
     .subtitle {
       color: #6b7280;
-      margin-bottom: 24px;
+      margin-bottom: 4px;
     }
 
-    .year {
-      margin-top: 32px;
-      font-size: 26px;
-      font-weight: bold;
-    }
+	.first-year {
+	  margin-top: 0;
+	}
 
+	.year-header {
+	  display: flex;
+	  align-items: baseline;
+	  gap: 14px;
+	  margin-top: 32px;
+	}
+
+	.first-year .year-header {
+	  margin-top: 6px;
+	}
+
+	.year {
+	  font-size: 26px;
+	  font-weight: bold;
+	}
+
+	.year-stats {
+	  color: #6b7280;
+	  font-size: 14px;
+	}
+	
     .matches {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -136,9 +156,7 @@
   </style>
 </head>
 <body>
-
   <div id="app">Betöltés...</div>
-
   <script>
     const app = document.getElementById("app");
 
@@ -443,13 +461,47 @@
     function render(years) {
       app.innerHTML = "";
 
-      Object.keys(years).sort((a, b) => b - a).forEach(year => {
-        const yearBlock = document.createElement("section");
+	  Object.keys(years).sort((a, b) => b - a).forEach((year, index) => {
+		const yearBlock = document.createElement("section");
+		yearBlock.className = index === 0 ? "year-block first-year" : "year-block";
 
-        const matches = Object.values(years[year])
-          .sort((a, b) => Number(b.match_no) - Number(a.match_no));
+		const matches = Object.values(years[year])
+		  .sort((a, b) => Number(b.match_no) - Number(a.match_no));
 
-        yearBlock.innerHTML = `<div class="year">${year}</div>`;
+		const wins = matches.filter(m => m.match_hu > m.match_opp).length;
+		const losses = matches.filter(m => m.match_hu < m.match_opp).length;
+		const draws = matches.filter(m => m.match_hu === m.match_opp).length;
+
+		const duelWins = matches.reduce((sum, m) =>
+		  sum + m.duels.filter(d => d.hu_score > d.opp_score).length, 0
+		);
+
+		const duelCount = matches.reduce((sum, m) => sum + m.duels.length, 0);
+
+		const duelWinRate = duelCount
+		  ? Math.round((duelWins / duelCount) * 100)
+		  : 0;
+
+		const stats = [
+		  `${matches.length} mérkőzés`,
+		  `${wins} győzelem`,
+		  `${losses} vereség`
+		];
+
+		if (draws > 0) {
+		  stats.push(`${draws} döntetlen`);
+		}
+
+		stats.push(`${duelWinRate}% párharcgyőzelem`);
+
+		yearBlock.innerHTML = `
+		  <div class="year-header">
+			<div class="year">${year}</div>
+			<div class="year-stats">
+			  ${stats.join(" · ")}
+			</div>
+		  </div>
+		`;
 
         const matchesDiv = document.createElement("div");
         matchesDiv.className = "matches";
