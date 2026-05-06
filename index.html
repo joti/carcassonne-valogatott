@@ -5,7 +5,7 @@
   <title>Magyar Carcassonne válogatott</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Frank Ruhl Libre", Arial, sans-serif;
       background: #f5f7fa;
       margin: 0;
       padding: 32px;
@@ -15,6 +15,11 @@
     h1 {
       margin-bottom: 4px;
     }
+
+	body,
+	.card {
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	}
 
     .subtitle {
       color: #6b7280;
@@ -29,7 +34,7 @@
 
     .matches {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-top: 16px;
     }
@@ -71,9 +76,9 @@
 
     .score {
       text-align: center;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
-      margin: 14px 0;
+      margin: 10px 0;
     }
 
     .win { color: #15803d; }
@@ -104,6 +109,16 @@
     .player-loss {
       background: #fee2e2;
     }
+	
+	.opp-player {
+	  background: #f3f4f6;
+	  padding: 3px 4px;
+	  border-radius: 5px;
+
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	}
 
     .duel-score {
       text-align: center;
@@ -155,7 +170,7 @@
 	function competitionLabel(code) {
 	  if (code === "vb") return "WTCOC";
 	  if (code === "Eb") return "ETCOC";
-      if (code === "-") return "Barátságos mérkőzés";
+      if (code === "-") return "Barátságos m.";
       return code;
 	}
 
@@ -214,7 +229,7 @@
                 <div class="duel">
                   <div class="player ${huWon ? "player-win" : "player-loss"}">${duel.hu_player}</div>
                   <div class="duel-score">${duel.hu_score}–${duel.opp_score}</div>
-                  <div>${duel.opp_player}</div>
+                  <div class="opp-player">${duel.opp_player}</div>
                 </div>
               `;
             })
