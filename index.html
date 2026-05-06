@@ -5,7 +5,7 @@
   <title>Magyar Carcassonne válogatott</title>
   <style>
     body {
-      font-family: "Frank Ruhl Libre", Arial, sans-serif;
+      font-family: Arial, sans-serif;
       background: #f5f7fa;
       margin: 0;
       padding: 32px;
@@ -68,6 +68,15 @@
       font-weight: bold;
     }
 
+	.flag {
+	  width: 18px;
+	  height: 12px;
+	  object-fit: cover;
+	  border-radius: 2px;
+	  margin-right: 6px;
+	  vertical-align: -1px;
+	}
+	
     .meta {
       color: #6b7280;
       font-size: 14px;
@@ -174,6 +183,232 @@
       return code;
 	}
 
+	function countryFlag(country) {
+
+	  const flags = {
+
+		"Afganisztán": "af",
+		"Albánia": "al",
+		"Algéria": "dz",
+		"Andorra": "ad",
+		"Angola": "ao",
+		"Antigua és Barbuda": "ag",
+		"Argentína": "ar",
+		"Ausztrália": "au",
+		"Ausztria": "at",
+		"Azerbajdzsán": "az",
+
+		"Bahama-szigetek": "bs",
+		"Bahrein": "bh",
+		"Banglades": "bd",
+		"Barbados": "bb",
+		"Belgium": "be",
+		"Belize": "bz",
+		"Benin": "bj",
+		"Bhután": "bt",
+		"Bissau-Guinea": "gw",
+		"Bolívia": "bo",
+		"Bosznia-Hercegovina": "ba",
+		"Botswana": "bw",
+		"Brazília": "br",
+		"Brunei": "bn",
+		"Bulgária": "bg",
+		"Burkina Faso": "bf",
+		"Burundi": "bi",
+
+		"Chile": "cl",
+		"Ciprus": "cy",
+		"Costa Rica": "cr",
+		"Comore-szigetek": "km",
+		"Csád": "td",
+		"Csehország": "cz",
+
+		"Dánia": "dk",
+		"Dél-afrikai Köztársaság": "za",
+		"Dél-Korea": "kr",
+		"Dél-Szudán": "ss",
+		"Dominika": "dm",
+		"Dominikai Köztársaság": "do",
+		"Dzsibuti": "dj",
+
+		"Ecuador": "ec",
+		"Egyenlítői-Guinea": "gq",
+		"Egyesült Arab Emírségek": "ae",
+		"Egyesült Államok": "us",
+		"Egyesült Királyság": "gb",
+		"Egyiptom": "eg",
+		"Elefántcsontpart": "ci",
+		"Eritrea": "er",
+		"Észtország": "ee",
+		"Eswatini": "sz",
+		"Etiópia": "et",
+
+		"Fehéroroszország": "by",
+		"Fidzsi": "fj",
+		"Finnország": "fi",
+		"Franciaország": "fr",
+		"Fülöp-szigetek": "ph",
+
+		"Gabon": "ga",
+		"Gambia": "gm",
+		"Ghána": "gh",
+		"Görögország": "gr",
+		"Grenada": "gd",
+		"Grúzia": "ge",
+		"Guatemala": "gt",
+		"Guinea": "gn",
+		"Guyana": "gy",
+
+		"Haiti": "ht",
+		"Hollandia": "nl",
+		"Honduras": "hn",
+		"Hongkong": "hk",
+		"Horvátország": "hr",
+
+		"India": "in",
+		"Indonézia": "id",
+		"Irak": "iq",
+		"Irán": "ir",
+		"Írország": "ie",
+		"Izland": "is",
+		"Izrael": "il",
+
+		"Jamaica": "jm",
+		"Japán": "jp",
+		"Jemen": "ye",
+		"Jordánia": "jo",
+
+		"Kambodzsa": "kh",
+		"Kamerun": "cm",
+		"Kanada": "ca",
+		"Katalónia": "ct",
+		"Katar": "qa",
+		"Kazahsztán": "kz",
+		"Kelet-Timor": "tl",
+		"Kenya": "ke",
+		"Kína": "cn",
+		"Kirgizisztán": "kg",
+		"Kiribati": "ki",
+		"Kolumbia": "co",
+		"Kongói Demokratikus Köztársaság": "cd",
+		"Közép-afrikai Köztársaság": "cf",
+		"Kuba": "cu",
+		"Kuvait": "kw",
+
+		"Laosz": "la",
+		"Lengyelország": "pl",
+		"Lettország": "lv",
+		"Libanon": "lb",
+		"Libéria": "lr",
+		"Líbia": "ly",
+		"Liechtenstein": "li",
+		"Litvánia": "lt",
+		"Luxemburg": "lu",
+
+		"Madagaszkár": "mg",
+		"Magyarország": "hu",
+		"Malajzia": "my",
+		"Malawi": "mw",
+		"Maldív-szigetek": "mv",
+		"Mali": "ml",
+		"Málta": "mt",
+		"Marokkó": "ma",
+		"Marshall-szigetek": "mh",
+		"Mauritánia": "mr",
+		"Mauritius": "mu",
+		"Mexikó": "mx",
+		"Mianmar": "mm",
+		"Mikronézia": "fm",
+		"Moldova": "md",
+		"Monaco": "mc",
+		"Mongólia": "mn",
+		"Montenegró": "me",
+		"Mozambik": "mz",
+
+		"Namíbia": "na",
+		"Nauru": "nr",
+		"Nepál": "np",
+		"Nicaragua": "ni",
+		"Niger": "ne",
+		"Nigéria": "ng",
+		"Németország": "de",
+		"Norvégia": "no",
+
+		"Olaszország": "it",
+		"Omán": "om",
+		"Oroszország": "ru",
+
+		"Örményország": "am",
+
+		"Pakisztán": "pk",
+		"Palau": "pw",
+		"Palesztina": "ps",
+		"Panama": "pa",
+		"Pápua Új-Guinea": "pg",
+		"Paraguay": "py",
+		"Peru": "pe",
+		"Portugália": "pt",
+
+		"RCP": "rc",
+		"Románia": "ro",
+		"Ruanda": "rw",
+
+		"Saint Kitts és Nevis": "kn",
+		"Saint Lucia": "lc",
+		"Saint Vincent és a Grenadine-szigetek": "vc",
+		"Salamon-szigetek": "sb",
+		"Salvador": "sv",
+		"San Marino": "sm",
+		"São Tomé és Príncipe": "st",
+		"Spanyolország": "es",
+		"Srí Lanka": "lk",
+		"Suriname": "sr",
+		"Svájc": "ch",
+		"Svédország": "se",
+		"Szaúd-Arábia": "sa",
+		"Szenegál": "sn",
+		"Szerbia": "rs",
+		"Seychelle-szigetek": "sc",
+		"Sierra Leone": "sl",
+		"Szingapúr": "sg",
+		"Szíria": "sy",
+		"Szlovákia": "sk",
+		"Szlovénia": "si",
+		"Szomália": "so",
+		"Szudán": "sd",
+		"Tádzsikisztán": "tj",
+		"Tajvan": "tw",
+		"Tanzánia": "tz",
+		"Thaiföld": "th",
+		"Togo": "tg",
+		"Tonga": "to",
+		"Trinidad és Tobago": "tt",
+		"Tunézia": "tn",
+		"Tutejšyja": "tu",
+		"Törökország": "tr",
+		"Türkmenisztán": "tm",
+		"Tuvalu": "tv",
+
+		"Uganda": "ug",
+		"Ukrajna": "ua",
+		"Uruguay": "uy",
+		"Új-Zéland": "nz",
+		"Üzbegisztán": "uz",
+
+		"Vanuatu": "vu",
+		"Vatikán": "va",
+		"Venezuela": "ve",
+		"Vietnam": "vn",
+
+		"Zambia": "zm",
+		"Zimbabwe": "zw",
+		"Zöld-foki Köztársaság": "cv",
+	  };
+
+	  return flags[country] || "unknown";
+	}
+
+	
 	function formatDate(year, shortDate) {
 
 	  const months = [
@@ -250,7 +485,12 @@
 		  card.className = `card ${competitionClass}`;		  
 
           card.innerHTML = `
-            <div class="opponent">${match.opponent}</div>
+			
+			<div class="opponent">
+			  <img class="flag"	src="flags/${countryFlag(match.opponent)}.webp" alt="">
+			  ${match.opponent}
+			</div>			
+			
             <div class="meta">${formatDate(match.year, match.date)} · ${competitionLabel(match.competition)}</div>
             <div class="score ${resultClass(match)}">${match.match_hu} – ${match.match_opp}</div>
             ${duelsHtml}
