@@ -5,7 +5,7 @@
   <title>Magyar Carcassonne válogatott</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Frank Ruhl Libre", Arial, sans-serif;
       background: #f5f7fa;
       margin: 0;
       padding: 24px;
@@ -26,6 +26,21 @@
       color: #6b7280;
       margin-bottom: 4px;
     }
+
+	.filters {
+	  display: flex;
+	  gap: 10px;
+	  margin: 12px 0 20px;
+	}
+
+	.filters select,
+	.filters input {
+	  padding: 8px 10px;
+	  border: 1px solid #d1d5db;
+	  border-radius: 8px;
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 14px;
+	}
 
 	.first-year {
 	  margin-top: 0;
@@ -54,7 +69,7 @@
 	
     .matches {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	  grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
       gap: 16px;
       margin-top: 16px;
     }
@@ -159,9 +174,55 @@
   </style>
 </head>
 <body>
+  <div class="filters">
+    <select id="opponentFilter">
+      <option value="">Minden ellenfél</option>
+    </select>
+
+    <input id="playerFilter" type="text" placeholder="Játékos keresése...">
+  </div>
+
   <div id="app">Betöltés...</div>
   <script>
     const app = document.getElementById("app");
+
+	let allRows = [];
+
+	function applyFilters() {
+	  const opponent = document.getElementById("opponentFilter").value;
+	  const player = document.getElementById("playerFilter").value.toLowerCase();
+
+	  const filteredRows = allRows.filter(row => {
+		const opponentOk = !opponent || row.opponent === opponent;
+
+		const playerOk =
+		  !player ||
+		  row.hu_player.toLowerCase().includes(player) ||
+		  row.opp_player.toLowerCase().includes(player);
+
+		return opponentOk && playerOk;
+	  });
+
+	  render(groupData(filteredRows));
+	}
+
+	function fillOpponentFilter(rows) {
+	  const select = document.getElementById("opponentFilter");
+
+	  const opponents = [...new Set(rows.map(r => r.opponent))]
+		.filter(Boolean)
+		.sort((a, b) => a.localeCompare(b, "hu"));
+
+	  opponents.forEach(opponent => {
+		const option = document.createElement("option");
+		option.value = opponent;
+		option.textContent = opponent;
+		select.appendChild(option);
+	  });
+
+	  select.addEventListener("change", applyFilters);
+	  document.getElementById("playerFilter").addEventListener("input", applyFilters);
+	}
 
     function groupData(rows) {
       const years = {};
@@ -575,6 +636,10 @@
 
           return obj;
         });
+
+		allRows = rows;
+
+		fillOpponentFilter(rows);
 
         render(groupData(rows));
       } catch (e) {
