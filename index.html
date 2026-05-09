@@ -42,20 +42,21 @@
 	  font-size: 14px;
 	}
 
-	@media (max-width: 600px) {
-	  .filters {
-    	flex-direction: column;
-    	align-items: stretch;
-    	padding-right: 8px;
-	  }
+	.filter-checkbox {
+	  display: flex;
+	  align-items: center;
+	  gap: 6px;
+	  font-size: 14px;
+	  color: #4b5563;
+	  white-space: nowrap;
+	}	
+	
+	.summary {
+	  margin: 8px 0 18px;
+	  color: #6b7280;
+	  font-size: 14px;
+	}	
 
-	  .filters select,
-	  .filters input {
-    	width: 100%;
-	    box-sizing: border-box;
-	  }
-	}
-	  
 	.first-year {
 	  margin-top: 0;
 	}
@@ -194,7 +195,13 @@
     </select>
 
     <input id="playerFilter" type="text" placeholder="Játékos keresése...">
+
+	<label class="filter-checkbox">
+	  <input id="onlyPlayerDuels" type="checkbox">
+	  Egyéni
+	</label>	
   </div>
+  <div id="summary" class="summary"></div>
 
   <div id="app">Betöltés...</div>
   <script>
@@ -205,18 +212,46 @@
 	function applyFilters() {
 	  const opponent = document.getElementById("opponentFilter").value;
 	  const player = document.getElementById("playerFilter").value.toLowerCase();
+	  const onlyPlayerDuels = document.getElementById("onlyPlayerDuels").checked;
 
-	  const filteredRows = allRows.filter(row => {
-		const opponentOk = !opponent || row.opponent === opponent;
+	  let filteredRows;
 
-		const playerOk =
-		  !player ||
-		  row.hu_player.toLowerCase().includes(player) ||
-		  row.opp_player.toLowerCase().includes(player);
+	  if (player && !onlyPlayerDuels) {
+		const matchingMatchKeys = new Set(
+		  allRows
+			.filter(row => {
+			  const opponentOk = !opponent || row.opponent === opponent;
 
-		return opponentOk && playerOk;
-	  });
+			  const playerOk =
+				row.hu_player.toLowerCase().includes(player) ||
+				row.opp_player.toLowerCase().includes(player);
 
+			  return opponentOk && playerOk;
+			})
+			.map(row => `${row.year}-${row.match_no}`)
+		);
+
+		filteredRows = allRows.filter(row => {
+		  const matchKey = `${row.year}-${row.match_no}`;
+		  const opponentOk = !opponent || row.opponent === opponent;
+
+		  return opponentOk && matchingMatchKeys.has(matchKey);
+		});
+
+	  } else {
+		filteredRows = allRows.filter(row => {
+		  const opponentOk = !opponent || row.opponent === opponent;
+
+		  const playerOk =
+			!player ||
+			row.hu_player.toLowerCase().includes(player) ||
+			row.opp_player.toLowerCase().includes(player);
+
+		  return opponentOk && playerOk;
+		});
+	  }
+
+	  renderSummary(filteredRows);
 	  render(groupData(filteredRows));
 	}
 
@@ -236,7 +271,60 @@
 
 	  select.addEventListener("change", applyFilters);
 	  document.getElementById("playerFilter").addEventListener("input", applyFilters);
+	  document.getElementById("onlyPlayerDuels").addEventListener("change", applyFilters);	  
 	}
+
+	function renderSummary(rows) {
+	  const matches = {};
+
+	  rows.forEach(row => {
+		const key = `${row.year}-${row.match_no}`;
+		if (!matches[key]) {
+		  matches[key] = {
+			match_hu: Number(row.match_hu),
+			match_opp: Number(row.match_opp),
+			duels: []
+		  };
+		}
+
+		matches[key].duels.push({
+		  hu_score: Number(row.hu_score),
+		  opp_score: Number(row.opp_score)
+		});
+	  });
+
+	  const matchList = Object.values(matches);
+
+	  const wins = matchList.filter(m => m.match_hu > m.match_opp).length;
+	  const losses = matchList.filter(m => m.match_hu < m.match_opp).length;
+	  const draws = matchList.filter(m => m.match_hu === m.match_opp).length;
+
+	  const duelWins = matchList.reduce((sum, m) =>
+		sum + m.duels.filter(d => d.hu_score > d.opp_score).length, 0
+	  );
+
+	  const duelCount = matchList.reduce((sum, m) => sum + m.duels.length, 0);
+
+	  const duelWinRate = duelCount
+		? Math.round((duelWins / duelCount) * 100)
+		: 0;
+
+	  const parts = [
+		`${matchList.length} mérkőzés`,
+		`${wins} győzelem`,
+		`${losses} vereség`
+	  ];
+
+	  if (draws > 0) {
+		parts.push(`${draws} döntetlen`);
+	  }
+
+	  parts.push(`${duelWinRate}% párharcgyőzelem`);
+
+	  document.getElementById("summary").textContent =
+		`Összesítés: ${parts.join(" · ")}`;
+	}
+
 
     function groupData(rows) {
       const years = {};
@@ -655,7 +743,9 @@
 
 		fillOpponentFilter(rows);
 
-        render(groupData(rows));
+		renderSummary(rows);
+		render(groupData(rows));		
+		
       } catch (e) {
         app.innerHTML = "Hiba feldolgozás közben:<br><pre>" + e.message + "</pre>";
       }
