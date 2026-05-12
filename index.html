@@ -216,18 +216,54 @@
 
 	.year-header {
 	  display: flex;
-	  align-items: baseline;
-	  gap: 14px;
-	  margin-top: 32px;
+	  align-items: center;
+	  gap: 22px;
+	  margin-bottom: 14px;
+	  margin-top: 24px;
+	  flex-wrap: wrap;
 	}
-
+	
 	.first-year .year-header {
 	  margin-top: 6px;
-	}
+	}	
 
 	.year {
-	  font-size: 26px;
-	  font-weight: bold;
+	  font-size: 28px;
+	  font-weight: 700;
+	  line-height: 1;
+	  flex-shrink: 0;
+	}
+
+	.year-summary {
+	  display: flex;
+	  align-items: center;
+	  gap: 22px;
+	  flex-wrap: wrap;
+	  position: relative;
+	  top: 4px;
+	  color: #6b7280;
+	  font-size: 13px;
+	}
+
+	.year-summary-line {
+	  display: flex;
+	  align-items: center;
+	  gap: 7px;
+	}
+
+	@media (max-width: 700px) {
+
+	  .year-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	  }
+
+	  .year-summary {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+	  }
 	}
 
 	.year-stats {
@@ -901,25 +937,26 @@
 
 		yearBlock.innerHTML = `
 		  <div class="year-header">
-			<div class="year">${year}</div>
+		    <div class="year">${year}</div>
+
+		    <div class="year-summary">
+			  <div class="year-summary-line">
+			    <i data-lucide="trophy" class="stat-icon match-icon"></i>
+			    <span>${matchTextParts.join(" · ")}</span>
+			  </div>
+
+			  <div class="year-summary-line">
+			    <i data-lucide="swords" class="stat-icon duel-icon"></i>
+			    <span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
+			  </div>
+
+			  <div class="year-summary-line">
+			    <i data-lucide="chart-column" class="stat-icon game-icon"></i>
+			    <span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
+			  </div>
+	  	    </div>
 		  </div>
 
-		  <div class="year-summary">
-			<div class="year-summary-line">
-			  <i data-lucide="trophy" class="stat-icon match-icon"></i>
-			  <span>${matchTextParts.join(" · ")}</span>
-			</div>
-
-			<div class="year-summary-line">
-			  <i data-lucide="swords" class="stat-icon duel-icon"></i>
-			  <span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
-			</div>
-
-			<div class="year-summary-line">
-			  <i data-lucide="chart-column" class="stat-icon game-icon"></i>
-			  <span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
-			</div>
-		  </div>
 		`;
 
         const matchesDiv = document.createElement("div");
