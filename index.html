@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: "Frank Ruhl Libre", Arial, sans-serif;
-      background: #f5f7fa;
+      background: white;
       margin: 0;
       padding: 24px;
       padding-top: 12px;
@@ -25,6 +25,17 @@
     .subtitle {
       color: #6b7280;
       margin-bottom: 4px;
+    }
+
+    .intro {
+	  background-color: white;
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 16px;
+    }
+
+    .introfooter {
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 14px;
     }
 
 	.filters {
@@ -379,6 +390,7 @@
   </style>
 </head>
 <body>
+  <div id="intro" class="intro"></div>
   <div class="filters">
     <select id="opponentFilter">
       <option value="">Minden ellenfél</option>
@@ -490,6 +502,45 @@
 
 		  applyFilters();
 	  });
+	}
+
+	function renderIntro(rows) {
+	  const matchKeys = new Set(rows.map(r => `${r.year}-${r.match_no}`));
+	  const opponents = new Set(rows.map(r => r.opponent).filter(Boolean));
+
+	  const continentCounts = {};
+
+	  opponents.forEach(country => {
+	    const continent = countryContinent(country);
+
+	    continentCounts[continent] =
+		  (continentCounts[continent] || 0) + 1;
+  	  });
+
+  	  const continentText = Object.entries(continentCounts)
+	    .map(([continent, count]) => {
+		  const label = {
+		    "Afrika": "afrikai",
+		    "Európa": "európai",
+		    "Ázsia": "ázsiai*",
+		    "Amerika": "amerikai",
+		    "Óceánia": "óceániai"
+  		  }[continent] || continent;
+
+		  return `${count} ${label}`;
+	    })
+	    .join(", ");
+
+	  document.getElementById("intro").innerHTML = `
+		<p>
+		  Magyarország csapata a 2020-as online csapat-világbajnokságon mutatkozott be,
+		  azóta összesen <strong>${matchKeys.size}</strong> meccset vívtunk, és
+		  <strong>${opponents.size}</strong> különböző ország/régió csapatával (${continentText}) mérkőztünk meg.
+		  Az alábbiakban az eddig elért eredményeink láthatóak.
+		</p>
+		<p class="introfooter">* Ausztrália csapatát is ide számítva, akik részt vesznek az Ázsia Kupán .
+		</p></br>
+	  `;
 	}
 
 	function renderSummary(rows) {
@@ -618,6 +669,232 @@
       if (code === "-") return "Barátságos m.";
       return code;
 	}
+
+function countryContinent(country) {
+
+  const continents = {
+
+    "Afganisztán": "Ázsia",
+    "Albánia": "Európa",
+    "Algéria": "Afrika",
+    "Andorra": "Európa",
+    "Angola": "Afrika",
+    "Antigua és Barbuda": "Amerika",
+    "Argentína": "Amerika",
+    "Ausztrália": "Ázsia", // Ausztrália részt vesz az Ázsia Kupán
+    "Ausztria": "Európa",
+    "Azerbajdzsán": "Európa",
+
+    "Bahama-szigetek": "Amerika",
+    "Bahrein": "Ázsia",
+    "Banglades": "Ázsia",
+    "Barbados": "Amerika",
+    "Belgium": "Európa",
+    "Belize": "Amerika",
+    "Benin": "Afrika",
+    "Bhután": "Ázsia",
+    "Bissau-Guinea": "Afrika",
+    "Bolívia": "Amerika",
+    "Bosznia-Hercegovina": "Európa",
+    "Botswana": "Afrika",
+    "Brazília": "Amerika",
+    "Brunei": "Ázsia",
+    "Bulgária": "Európa",
+    "Burkina Faso": "Afrika",
+    "Burundi": "Afrika",
+
+    "Chile": "Amerika",
+    "Ciprus": "Európa",
+    "Costa Rica": "Amerika",
+    "Comore-szigetek": "Afrika",
+    "Csád": "Afrika",
+    "Csehország": "Európa",
+
+    "Dánia": "Európa",
+    "Dél-afrikai Köztársaság": "Afrika",
+    "Dél-Korea": "Ázsia",
+    "Dél-Szudán": "Afrika",
+    "Dominika": "Amerika",
+    "Dominikai Köztársaság": "Amerika",
+    "Dzsibuti": "Afrika",
+
+    "Ecuador": "Amerika",
+    "Egyenlítői-Guinea": "Afrika",
+    "Egyesült Arab Emírségek": "Ázsia",
+    "Egyesült Államok": "Amerika",
+    "Egyesült Királyság": "Európa",
+    "Egyiptom": "Afrika",
+    "Elefántcsontpart": "Afrika",
+    "Eritrea": "Afrika",
+    "Észtország": "Európa",
+    "Eswatini": "Afrika",
+    "Etiópia": "Afrika",
+
+    "Fehéroroszország": "Európa",
+    "Fidzsi": "Óceánia",
+    "Finnország": "Európa",
+    "Franciaország": "Európa",
+    "Fülöp-szigetek": "Ázsia",
+
+    "Gabon": "Afrika",
+    "Gambia": "Afrika",
+    "Ghána": "Afrika",
+    "Görögország": "Európa",
+    "Grenada": "Amerika",
+    "Grúzia": "Európa",
+    "Guatemala": "Amerika",
+    "Guinea": "Afrika",
+    "Guyana": "Amerika",
+
+    "Haiti": "Amerika",
+    "Hollandia": "Európa",
+    "Honduras": "Amerika",
+    "Hongkong": "Ázsia",
+    "Horvátország": "Európa",
+
+    "India": "Ázsia",
+    "Indonézia": "Ázsia",
+    "Irak": "Ázsia",
+    "Irán": "Ázsia",
+    "Írország": "Európa",
+    "Izland": "Európa",
+    "Izrael": "Ázsia",
+
+    "Jamaica": "Amerika",
+    "Japán": "Ázsia",
+    "Jemen": "Ázsia",
+    "Jordánia": "Ázsia",
+
+    "Kambodzsa": "Ázsia",
+    "Kamerun": "Afrika",
+    "Kanada": "Amerika",
+    "Katalónia": "Európa",
+    "Katar": "Ázsia",
+    "Kazahsztán": "Ázsia",
+    "Kelet-Timor": "Ázsia",
+    "Kenya": "Afrika",
+    "Kína": "Ázsia",
+    "Kirgizisztán": "Ázsia",
+    "Kiribati": "Óceánia",
+    "Kolumbia": "Amerika",
+    "Kongói Demokratikus Köztársaság": "Afrika",
+    "Közép-afrikai Köztársaság": "Afrika",
+    "Kuba": "Amerika",
+    "Kuvait": "Ázsia",
+
+    "Laosz": "Ázsia",
+    "Lengyelország": "Európa",
+    "Lettország": "Európa",
+    "Libanon": "Ázsia",
+    "Libéria": "Afrika",
+    "Líbia": "Afrika",
+    "Liechtenstein": "Európa",
+    "Litvánia": "Európa",
+    "Luxemburg": "Európa",
+
+    "Madagaszkár": "Afrika",
+    "Magyarország": "Európa",
+    "Malajzia": "Ázsia",
+    "Malawi": "Afrika",
+    "Maldív-szigetek": "Ázsia",
+    "Mali": "Afrika",
+    "Málta": "Európa",
+    "Marokkó": "Afrika",
+    "Marshall-szigetek": "Óceánia",
+    "Mauritánia": "Afrika",
+    "Mauritius": "Afrika",
+    "Mexikó": "Amerika",
+    "Mianmar": "Ázsia",
+    "Mikronézia": "Óceánia",
+    "Moldova": "Európa",
+    "Monaco": "Európa",
+    "Mongólia": "Ázsia",
+    "Montenegró": "Európa",
+    "Mozambik": "Afrika",
+
+    "Namíbia": "Afrika",
+    "Nauru": "Óceánia",
+    "Nepál": "Ázsia",
+    "Nicaragua": "Amerika",
+    "Niger": "Afrika",
+    "Nigéria": "Afrika",
+    "Németország": "Európa",
+    "Norvégia": "Európa",
+
+    "Olaszország": "Európa",
+    "Omán": "Ázsia",
+    "Oroszország": "Európa",
+
+    "Örményország": "Európa",
+
+    "Pakisztán": "Ázsia",
+    "Palau": "Óceánia",
+    "Palesztina": "Ázsia",
+    "Panama": "Amerika",
+    "Pápua Új-Guinea": "Óceánia",
+    "Paraguay": "Amerika",
+    "Peru": "Amerika",
+    "Portugália": "Európa",
+
+    "RCP": "Európa",
+    "Románia": "Európa",
+    "Ruanda": "Afrika",
+
+    "Saint Kitts és Nevis": "Amerika",
+    "Saint Lucia": "Amerika",
+    "Saint Vincent és a Grenadine-szigetek": "Amerika",
+    "Salamon-szigetek": "Óceánia",
+    "Salvador": "Amerika",
+    "San Marino": "Európa",
+    "São Tomé és Príncipe": "Afrika",
+    "Spanyolország": "Európa",
+    "Srí Lanka": "Ázsia",
+    "Suriname": "Amerika",
+    "Svájc": "Európa",
+    "Svédország": "Európa",
+    "Szaúd-Arábia": "Ázsia",
+    "Szenegál": "Afrika",
+    "Szerbia": "Európa",
+    "Seychelle-szigetek": "Afrika",
+    "Sierra Leone": "Afrika",
+    "Szingapúr": "Ázsia",
+    "Szíria": "Ázsia",
+    "Szlovákia": "Európa",
+    "Szlovénia": "Európa",
+    "Szomália": "Afrika",
+    "Szudán": "Afrika",
+
+    "Tádzsikisztán": "Ázsia",
+    "Tajvan": "Ázsia",
+    "Tanzánia": "Afrika",
+    "Thaiföld": "Ázsia",
+    "Togo": "Afrika",
+    "Tonga": "Óceánia",
+    "Trinidad és Tobago": "Amerika",
+    "Tunézia": "Afrika",
+    "Tutejšyja": "Európa",
+    "Törökország": "Ázsia",
+    "Türkmenisztán": "Ázsia",
+    "Tuvalu": "Óceánia",
+
+    "Uganda": "Afrika",
+    "Ukrajna": "Európa",
+    "Uruguay": "Amerika",
+    "Új-Zéland": "Óceánia",
+    "Üzbegisztán": "Ázsia",
+
+    "Vanuatu": "Óceánia",
+    "Vatikán": "Európa",
+    "Venezuela": "Amerika",
+    "Vietnam": "Ázsia",
+
+    "Zambia": "Afrika",
+    "Zimbabwe": "Afrika",
+    "Zöld-foki Köztársaság": "Afrika",
+  };
+
+  return continents[country] || "Ismeretlen";
+}
 
 	function countryFlag(country) {
 
@@ -1039,6 +1316,7 @@
 
 		fillOpponentFilter(rows);
 
+  	    renderIntro(rows);
 		renderSummary(rows);
 		render(groupData(rows));		
 		
