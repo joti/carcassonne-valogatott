@@ -420,10 +420,21 @@
 	let allRows = [];
 	let duelOnlyMode = false;
 
+	function normalizeCountry(country) {
+	  if (country === "RCP") {
+		return "Oroszország";
+	  }
+	  if (country === "Tutejšyja") {
+		return "Fehéroroszország";
+	  }
+
+	  return country;
+	}
+
 	function applyFilters() {
 	  const opponent = document.getElementById("opponentFilter").value;
 	  const player = document.getElementById("playerFilter").value.toLowerCase();
-      const onlyPlayerDuels = duelOnlyMode;
+	  const onlyPlayerDuels = duelOnlyMode;
 
 	  let filteredRows;
 
@@ -431,7 +442,8 @@
 		const matchingMatchKeys = new Set(
 		  allRows
 			.filter(row => {
-			  const opponentOk = !opponent || row.opponent === opponent;
+			  const opponentOk =
+				!opponent || normalizeCountry(row.opponent) === opponent;
 
 			  const playerOk =
 				row.hu_player.toLowerCase().includes(player) ||
@@ -444,14 +456,17 @@
 
 		filteredRows = allRows.filter(row => {
 		  const matchKey = `${row.year}-${row.match_no}`;
-		  const opponentOk = !opponent || row.opponent === opponent;
+
+		  const opponentOk =
+			!opponent || normalizeCountry(row.opponent) === opponent;
 
 		  return opponentOk && matchingMatchKeys.has(matchKey);
 		});
 
 	  } else {
 		filteredRows = allRows.filter(row => {
-		  const opponentOk = !opponent || row.opponent === opponent;
+		  const opponentOk =
+			!opponent || normalizeCountry(row.opponent) === opponent;
 
 		  const playerOk =
 			!player ||
@@ -506,9 +521,10 @@
 	  });
 	}
 
+
 	function renderIntro(rows) {
 	  const matchKeys = new Set(rows.map(r => `${r.year}-${r.match_no}`));
-	  const opponents = new Set(rows.map(r => r.opponent).filter(Boolean));
+	  const opponents = new Set(rows.map(r => normalizeCountry(r.opponent)).filter(Boolean));
 
 	  const continentCounts = {};
 
