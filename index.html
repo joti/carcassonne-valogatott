@@ -31,31 +31,184 @@
 	  display: flex;
 	  gap: 10px;
 	  margin: 12px 0 20px;
+	  flex-wrap: wrap;
+	  align-items: center;
 	}
 
 	.filters select,
 	.filters input {
-	  padding: 8px 10px;
+	  box-sizing: border-box;
+      padding: 8px 10px;
 	  border: 1px solid #d1d5db;
 	  border-radius: 8px;
 	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
 	  font-size: 14px;
 	}
 
+	.view-toggle {
+	  display: flex;
+	  border: 1px solid #d1d5db;
+	  border-radius: 10px;
+	  overflow: hidden;
+	  height: 38px;
+	}
+
+	.view-toggle button {
+	  border: none;
+	  background: #fff;
+	  padding: 0 14px;
+	  font-size: 14px;
+	  cursor: pointer;
+	  color: #4b5563;
+	  transition: 0.15s;
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 14px;
+	}
+
+	.view-toggle button:hover {
+	  background: #f3f4f6;
+	}
+
+	.view-toggle button.active {
+	  background: #2563eb;
+	  color: white;
+	}
+
+	@media (max-width: 700px) {
+
+	  .view-toggle {
+		width: 100%;
+	  }
+
+	  .view-toggle button {
+		flex: 1;
+	  }
+	}
+
 	.filter-checkbox {
 	  display: flex;
 	  align-items: center;
 	  gap: 6px;
-	  font-size: 14px;
-	  color: #4b5563;
 	  white-space: nowrap;
-	}	
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 14px;
+	}
+
+	@media (max-width: 700px) {
+	  .filters {
+		flex-direction: column;
+		align-items: stretch;
+	  }
+
+	  .filters select,
+	  .filters input {
+		width: 100%;
+	  }
+
+	  .filter-checkbox {
+		width: 100%;
+		justify-content: flex-start;
+		padding-left: 2px;
+	  }
+	}
 	
 	.summary {
-	  margin: 8px 0 18px;
+	  display: grid;
+	  grid-template-columns: repeat(3, minmax(0, 1fr));
+	  gap: 10px;
+	  margin: 10px 0 20px;
+	}
+
+	.summary-card {
+	  display: flex;
+	  align-items: center;
+	  gap: 16px;
+	  background: white;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 14px;
+	  padding: 18px 20px;
+	  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+	}
+
+	.summary-icon-circle {
+	  width: 56px;
+	  height: 56px;
+	  border-radius: 50%;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  flex-shrink: 0;
+	}
+
+	.summary-icon-circle .stat-icon {
+	  width: 28px;
+	  height: 28px;
+	}
+
+	.match-bg { background: #eaf1ff; }
+	.duel-bg { background: #e8f7ed; }
+	.game-bg { background: #f1eaff; }
+
+	.summary-title {
+	  font-size: 13px;
+	  font-weight: 700;
 	  color: #6b7280;
-	  font-size: 14px;
-	}	
+	  text-transform: uppercase;
+	  letter-spacing: 0.04em;
+	}
+
+	.summary-main {
+	  font-size: 24px;
+	  font-weight: 700;
+	  margin-top: 2px;
+	  color: #111827;
+	}
+
+	.summary-detail {
+	  font-size: 13px;
+	  color: #6b7280;
+	  margin-top: 2px;
+	}
+
+	@media (max-width: 700px) {
+	  .summary {
+		grid-template-columns: 1fr;
+	  }
+	}
+
+	.year-summary {
+	  margin-top: 6px;
+	  margin-bottom: 14px;
+	  color: #6b7280;
+	  font-size: 13px;
+	  line-height: 1.55;
+	}
+
+	.year-summary-line {
+	  display: flex;
+	  align-items: center;
+	  gap: 7px;
+	}
+
+	.stat-icon {
+	  width: 16px;
+	  height: 16px;
+	  stroke-width: 2.2;
+	  flex-shrink: 0;
+	}
+
+	.match-icon {
+	  color: #2563eb;
+	}
+
+	.duel-icon {
+	  color: #16a34a;
+	}
+
+	.game-icon {
+	  color: #7c3aed;
+	}
+
 
 	.first-year {
 	  margin-top: 0;
@@ -196,23 +349,30 @@
 
     <input id="playerFilter" type="text" placeholder="Játékos keresése...">
 
-	<label class="filter-checkbox">
-	  <input id="onlyPlayerDuels" type="checkbox">
-	  Egyéni
-	</label>	
+	<div class="view-toggle">
+	  <button id="fullMatchesBtn" class="active" type="button">
+		Csapat nézet
+	  </button>
+
+	  <button id="duelsOnlyBtn" type="button">
+		Játékos nézet
+	  </button>
+	</div>
   </div>
   <div id="summary" class="summary"></div>
 
   <div id="app">Betöltés...</div>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     const app = document.getElementById("app");
 
 	let allRows = [];
+	let duelOnlyMode = false;
 
 	function applyFilters() {
 	  const opponent = document.getElementById("opponentFilter").value;
 	  const player = document.getElementById("playerFilter").value.toLowerCase();
-	  const onlyPlayerDuels = document.getElementById("onlyPlayerDuels").checked;
+      const onlyPlayerDuels = duelOnlyMode;
 
 	  let filteredRows;
 
@@ -271,7 +431,28 @@
 
 	  select.addEventListener("change", applyFilters);
 	  document.getElementById("playerFilter").addEventListener("input", applyFilters);
-	  document.getElementById("onlyPlayerDuels").addEventListener("change", applyFilters);	  
+
+
+	  const fullMatchesBtn = document.getElementById("fullMatchesBtn");
+  	  const duelsOnlyBtn = document.getElementById("duelsOnlyBtn");
+
+	  fullMatchesBtn.addEventListener("click", () => {
+		  duelOnlyMode = false;
+
+		  fullMatchesBtn.classList.add("active");
+		  duelsOnlyBtn.classList.remove("active");
+
+		  applyFilters();
+	  });
+
+	  duelsOnlyBtn.addEventListener("click", () => {
+		  duelOnlyMode = true;
+
+		  duelsOnlyBtn.classList.add("active");
+		  fullMatchesBtn.classList.remove("active");
+
+		  applyFilters();
+	  });
 	}
 
 	function renderSummary(rows) {
@@ -279,6 +460,7 @@
 
 	  rows.forEach(row => {
 		const key = `${row.year}-${row.match_no}`;
+
 		if (!matches[key]) {
 		  matches[key] = {
 			match_hu: Number(row.match_hu),
@@ -295,36 +477,69 @@
 
 	  const matchList = Object.values(matches);
 
-	  const wins = matchList.filter(m => m.match_hu > m.match_opp).length;
-	  const losses = matchList.filter(m => m.match_hu < m.match_opp).length;
-	  const draws = matchList.filter(m => m.match_hu === m.match_opp).length;
+	  const matchWins = matchList.filter(m => m.match_hu > m.match_opp).length;
+	  const matchLosses = matchList.filter(m => m.match_hu < m.match_opp).length;
+	  const matchDraws = matchList.filter(m => m.match_hu === m.match_opp).length;
 
-	  const duelWins = matchList.reduce((sum, m) =>
-		sum + m.duels.filter(d => d.hu_score > d.opp_score).length, 0
-	  );
+	  const duels = matchList.flatMap(m => m.duels);
 
-	  const duelCount = matchList.reduce((sum, m) => sum + m.duels.length, 0);
+	  const duelWins = duels.filter(d => d.hu_score > d.opp_score).length;
+	  const duelCount = duels.length;
+	  const duelWinRate = duelCount ? Math.round((duelWins / duelCount) * 100) : 0;
 
-	  const duelWinRate = duelCount
-		? Math.round((duelWins / duelCount) * 100)
-		: 0;
+	  const gameWins = duels.reduce((sum, d) => sum + d.hu_score, 0);
+	  const gameLosses = duels.reduce((sum, d) => sum + d.opp_score, 0);
+	  const gameCount = gameWins + gameLosses;
+	  const gameWinRate = gameCount ? Math.round((gameWins / gameCount) * 100) : 0;
 
-	  const parts = [
-		`${matchList.length} mérkőzés`,
-		`${wins} győzelem`,
-		`${losses} vereség`
+	  const matchDetails = [
+		`${matchWins} győzelem`,
+		`${matchLosses} vereség`
 	  ];
 
-	  if (draws > 0) {
-		parts.push(`${draws} döntetlen`);
+	  if (matchDraws > 0) {
+		matchDetails.push(`${matchDraws} döntetlen`);
 	  }
 
-	  parts.push(`${duelWinRate}% párharcgyőzelem`);
+	  document.getElementById("summary").innerHTML = `
+		<div class="summary-card">
+		  <div class="summary-icon-circle match-bg">
+			<i data-lucide="trophy" class="stat-icon match-icon"></i>
+		  </div>
+		  <div>
+			<div class="summary-title">Mérkőzések</div>
+			<div class="summary-main">${matchList.length}</div>
+			<div class="summary-detail">${matchDetails.join(" · ")}</div>
+		  </div>
+		</div>
 
-	  document.getElementById("summary").textContent =
-		`Összesítés: ${parts.join(" · ")}`;
+		<div class="summary-card">
+		  <div class="summary-icon-circle duel-bg">
+		    <i data-lucide="swords" class="stat-icon duel-icon"></i>
+		  </div>		
+		  <div>
+			<div class="summary-title">Párharcok</div>
+		    <div class="summary-main">${duelCount}</div>
+  		    <div class="summary-detail">${duelWins} győzelem (${duelWinRate}%)</div>
+		  </div>
+		</div>
+
+		<div class="summary-card">
+		  <div class="summary-icon-circle game-bg">
+		    <i data-lucide="chart-column" class="stat-icon game-icon"></i>
+		  </div>		
+		  <div>
+			<div class="summary-title">Játszmák</div>
+		  <div class="summary-main">${gameCount}</div>
+		  <div class="summary-detail">${gameWins} győzelem (${gameWinRate}%)</div>
+		  </div>
+		</div>
+	  `;
+
+	  if (window.lucide) {
+		lucide.createIcons();
+	  }
 	}
-
 
     function groupData(rows) {
       const years = {};
@@ -660,11 +875,49 @@
 
 		stats.push(`${duelWinRate}% párharcgyőzelem`);
 
+		const matchTextParts = [
+		  `${matches.length} mérkőzés`,
+		  `${wins} győzelem`,
+		  `${losses} vereség`
+		];
+
+		if (draws > 0) {
+		  matchTextParts.push(`${draws} döntetlen`);
+		}
+
+		const gameWins = matches.reduce((sum, m) =>
+		  sum + m.duels.reduce((s, d) => s + d.hu_score, 0), 0
+		);
+
+		const gameLosses = matches.reduce((sum, m) =>
+		  sum + m.duels.reduce((s, d) => s + d.opp_score, 0), 0
+		);
+
+		const gameCount = gameWins + gameLosses;
+
+		const gameWinRate = gameCount
+		  ? Math.round((gameWins / gameCount) * 100)
+		  : 0;
+
 		yearBlock.innerHTML = `
 		  <div class="year-header">
 			<div class="year">${year}</div>
-			<div class="year-stats">
-			  ${stats.join(" · ")}
+		  </div>
+
+		  <div class="year-summary">
+			<div class="year-summary-line">
+			  <i data-lucide="trophy" class="stat-icon match-icon"></i>
+			  <span>${matchTextParts.join(" · ")}</span>
+			</div>
+
+			<div class="year-summary-line">
+			  <i data-lucide="swords" class="stat-icon duel-icon"></i>
+			  <span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
+			</div>
+
+			<div class="year-summary-line">
+			  <i data-lucide="chart-column" class="stat-icon game-icon"></i>
+			  <span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
 			</div>
 		  </div>
 		`;
@@ -719,6 +972,11 @@
 
         yearBlock.appendChild(matchesDiv);
         app.appendChild(yearBlock);
+		
+		if (window.lucide) {
+		  lucide.createIcons();
+		}		
+		
       });
     }
 
