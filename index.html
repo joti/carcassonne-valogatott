@@ -55,7 +55,7 @@
 	  border: 1px solid #d1d5db;
 	  border-radius: 8px;
 	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
-	  font-size: 14px;
+	  font-size: 15px;
 	}
 
 	.view-toggle {
@@ -75,7 +75,7 @@
 	  color: #4b5563;
 	  transition: 0.15s;
 	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
-	  font-size: 14px;
+	  font-size: 15px;
 	}
 
 	.view-toggle button:hover {
@@ -104,7 +104,7 @@
 	  gap: 6px;
 	  white-space: nowrap;
 	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
-	  font-size: 14px;
+	  font-size: 15px;
 	}
 
 	@media (max-width: 700px) {
@@ -179,7 +179,7 @@
 	}
 
 	.summary-detail {
-	  font-size: 13px;
+	  font-size: 14px;
 	  color: #6b7280;
 	  margin-top: 2px;
 	}
@@ -188,20 +188,6 @@
 	  .summary {
 		grid-template-columns: 1fr;
 	  }
-	}
-
-	.year-summary {
-	  margin-top: 6px;
-	  margin-bottom: 14px;
-	  color: #6b7280;
-	  font-size: 13px;
-	  line-height: 1.55;
-	}
-
-	.year-summary-line {
-	  display: flex;
-	  align-items: center;
-	  gap: 7px;
 	}
 
 	.stat-icon {
@@ -249,6 +235,8 @@
 	}
 
 	.year-summary {
+	  margin-top: 6px;
+	  margin-bottom: 14px;
 	  display: flex;
 	  align-items: center;
 	  gap: 22px;
@@ -256,7 +244,8 @@
 	  position: relative;
 	  top: 4px;
 	  color: #6b7280;
-	  font-size: 13px;
+	  font-size: 14px;
+	  line-height: 1.55;
 	}
 
 	.year-summary-line {
@@ -409,6 +398,10 @@
 		Játékos nézet
 	  </button>
 	</div>
+	<label class="filter-checkbox">
+	  <input id="groupByYear" type="checkbox" checked>
+	  Év szerinti bontás
+	</label>	
   </div>
   <div id="summary" class="summary"></div>
 
@@ -419,6 +412,7 @@
 
 	let allRows = [];
 	let duelOnlyMode = false;
+	let groupByYear = true;
 
 	function normalizeCountry(country) {
 	  if (country === "RCP") {
@@ -437,6 +431,8 @@
 	  const onlyPlayerDuels = duelOnlyMode;
 
 	  let filteredRows;
+
+	  groupByYear = document.getElementById("groupByYear").checked;
 
 	  if (player && !onlyPlayerDuels) {
 		const matchingMatchKeys = new Set(
@@ -478,7 +474,12 @@
 	  }
 
 	  renderSummary(filteredRows);
-	  render(groupData(filteredRows));
+	  
+	  if (groupByYear) {
+		  render(groupData(filteredRows));
+	  } else {
+		  renderWithoutYears(filteredRows);
+	  }	  
 	}
 
 	function fillOpponentFilter(rows) {
@@ -498,6 +499,10 @@
 	  select.addEventListener("change", applyFilters);
 	  document.getElementById("playerFilter").addEventListener("input", applyFilters);
 
+	  document.getElementById("groupByYear").addEventListener("change", e => {
+	    groupByYear = e.target.checked;
+	    applyFilters();
+	  });
 
 	  const fullMatchesBtn = document.getElementById("fullMatchesBtn");
   	  const duelsOnlyBtn = document.getElementById("duelsOnlyBtn");
@@ -1171,6 +1176,97 @@ function countryContinent(country) {
       return "draw";
     }
 
+	function renderMatchCard(match) {
+
+	  const duelsHtml = match.duels
+		.sort((a, b) => a.duel_no - b.duel_no)
+		.map(duel => {
+		  const huWon = duel.hu_score > duel.opp_score;
+
+		  return `
+			<div class="duel">
+			  <div class="player ${huWon ? "player-win" : "player-loss"}">
+				${duel.hu_player}
+			  </div>
+
+			  <div class="duel-score">
+				${duel.hu_score}–${duel.opp_score}
+			  </div>
+
+			  <div class="opp-player">
+				${duel.opp_player}
+			  </div>
+			</div>
+		  `;
+		})
+		.join("");
+
+	  const card = document.createElement("article");
+
+	  let competitionClass = "card-friendly";
+
+	  if (match.competition === "vb") {
+		competitionClass = "card-vb";
+	  }
+
+	  if (match.competition === "Eb") {
+		competitionClass = "card-eb";
+	  }
+
+	  card.className = `card ${competitionClass}`;
+
+	  card.innerHTML = `
+
+		<div class="opponent">
+		  <img class="flag"
+			   src="flags/${countryFlag(match.opponent)}.webp"
+			   alt="">
+		  ${match.opponent}
+		</div>
+
+		<div class="meta">
+		  ${formatDate(match.year, match.date)} ·
+		  ${competitionLabel(match.competition)}
+		</div>
+
+		<div class="score ${resultClass(match)}">
+		  ${match.match_hu} – ${match.match_opp}
+		</div>
+
+		${duelsHtml}
+	  `;
+
+	  return card;
+	}
+
+	function renderWithoutYears(rows) {
+
+	  app.innerHTML = "";
+
+	  const matches = Object.values(groupData(rows))
+		.flatMap(year => Object.values(year))
+		.sort((a, b) => {
+		  if (a.year !== b.year) {
+			return b.year - a.year;
+		  }
+
+		  return Number(b.match_no) - Number(a.match_no);
+		});
+
+	  const matchesDiv = document.createElement("div");
+	  matchesDiv.className = "matches";
+
+	  matches.forEach(match => {
+		matchesDiv.appendChild(renderMatchCard(match));
+	  });
+
+	  app.appendChild(matchesDiv);
+
+	  if (window.lucide) {
+		lucide.createIcons();
+	  }
+	}
+
     function render(years) {
       app.innerHTML = "";
 
@@ -1259,48 +1355,7 @@ function countryContinent(country) {
         matchesDiv.className = "matches";
 
         matches.forEach(match => {
-          const duelsHtml = match.duels
-            .sort((a, b) => a.duel_no - b.duel_no)
-            .map(duel => {
-              const huWon = duel.hu_score > duel.opp_score;
-
-              return `
-                <div class="duel">
-                  <div class="player ${huWon ? "player-win" : "player-loss"}">${duel.hu_player}</div>
-                  <div class="duel-score">${duel.hu_score}–${duel.opp_score}</div>
-                  <div class="opp-player">${duel.opp_player}</div>
-                </div>
-              `;
-            })
-            .join("");
-
-          const card = document.createElement("article");
-		  
-	  	  let competitionClass = "card-friendly";
-
-		  if (match.competition === "vb") {
-		    competitionClass = "card-vb";
-		  }
-
-		  if (match.competition === "Eb") {
-		    competitionClass = "card-eb";
-		  }
-
-		  card.className = `card ${competitionClass}`;		  
-
-          card.innerHTML = `
-			
-			<div class="opponent">
-			  <img class="flag"	src="flags/${countryFlag(match.opponent)}.webp" alt="">
-			  ${match.opponent}
-			</div>			
-			
-            <div class="meta">${formatDate(match.year, match.date)} · ${competitionLabel(match.competition)}</div>
-            <div class="score ${resultClass(match)}">${match.match_hu} – ${match.match_opp}</div>
-            ${duelsHtml}
-          `;
-
-          matchesDiv.appendChild(card);
+		  matchesDiv.appendChild(renderMatchCard(match));
         });
 
         yearBlock.appendChild(matchesDiv);
@@ -1335,8 +1390,7 @@ function countryContinent(country) {
 		fillOpponentFilter(rows);
 
   	    renderIntro(rows);
-		renderSummary(rows);
-		render(groupData(rows));		
+		applyFilters();		
 		
       } catch (e) {
         app.innerHTML = "Hiba feldolgozás közben:<br><pre>" + e.message + "</pre>";
