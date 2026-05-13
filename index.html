@@ -486,7 +486,7 @@
 	function fillOpponentFilter(rows) {
 	  const select = document.getElementById("opponentFilter");
 
-	  const opponents = [...new Set(rows.map(r => r.opponent))]
+	  const opponents = [...new Set(rows.map(r => normalizeCountry(r.opponent)))]
 		.filter(Boolean)
 		.sort((a, b) => a.localeCompare(b, "hu"));
 
