@@ -99,29 +99,39 @@
 	}
 
 	.filter-checkbox {
-	  display: flex;
+	  display: inline-flex;
 	  align-items: center;
-	  gap: 6px;
+	  gap: 8px;
 	  white-space: nowrap;
+	
 	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
 	  font-size: 15px;
+	  color: #4b5563;
 	}
-
+	
+	.filter-checkbox input {
+	  margin: 0;
+	  width: 16px;
+	  height: 16px;
+	  flex-shrink: 0;
+	}
+	
 	@media (max-width: 700px) {
+	
 	  .filters {
-		flex-direction: column;
-		align-items: stretch;
+	    flex-direction: column;
+	    align-items: stretch;
 	  }
-
+	
 	  .filters select,
 	  .filters input {
-		width: 100%;
+	    width: 100%;
 	  }
-
+	
 	  .filter-checkbox {
-		width: 100%;
-		justify-content: flex-start;
-		padding-left: 2px;
+	    width: 100%;
+	    justify-content: flex-start;
+	    padding-left: 2px;
 	  }
 	}
 	
