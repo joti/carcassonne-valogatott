@@ -122,9 +122,9 @@
 	    flex-direction: column;
 	    align-items: stretch;
 	  }
-
+	
 	  .filters select,
-	  .filters input[type="text"] {
+	  .filters input {
 	    width: 100%;
 	  }
 	
@@ -330,7 +330,7 @@
 	  border-radius: 2px;
 	  margin-right: 6px;
 	  vertical-align: -1px;
-      box-shadow: 0 0 0 1px #cfd4dc;
+	  box-shadow: 0 0 0 1px #cfd4dc;
 	}
 	
     .meta {
@@ -493,6 +493,17 @@
 	  }	  
 	}
 
+	function countMatchesForCountry(country) {
+	  const matchKeys = new Set();
+
+	  allRows.forEach(row => {
+		if (normalizeCountry(row.opponent) === country) {
+		  matchKeys.add(`${row.year}-${row.match_no}`);
+		}
+	  });
+	  return matchKeys.size;
+	}
+
 	function fillOpponentFilter(rows) {
 	  const select = document.getElementById("opponentFilter");
 
@@ -502,8 +513,11 @@
 
 	  opponents.forEach(opponent => {
 		const option = document.createElement("option");
+		const matchCount = countMatchesForCountry(opponent);
+
 		option.value = opponent;
-		option.textContent = opponent;
+		option.textContent = `${opponent} (${matchCount})`;		
+		
 		select.appendChild(option);
 	  });
 
@@ -572,7 +586,7 @@
 		  <strong>${opponents.size}</strong> különböző ország/régió csapatával (${continentText}) mérkőztünk meg.
 		  Az alábbiakban az eddig elért eredményeink láthatóak.
 		</p>
-		<p class="introfooter">* Ausztrália csapatát is ide számítva, akik részt vesznek az Ázsia Kupán.
+		<p class="introfooter">* Ausztrália csapatát is ide számítva, akik részt vesznek az Ázsia Kupán .
 		</p></br>
 	  `;
 	}
