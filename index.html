@@ -413,6 +413,10 @@
 	  <input id="groupByYear" type="checkbox" checked>
 	  Év szerinti bontás
 	</label>	
+	<label class="filter-checkbox">
+	  <input id="includeFriendly" type="checkbox" checked>
+	  Barátságos mérkőzések is
+	</label>	
   </div>
   <div id="summary" class="summary"></div>
 
@@ -424,6 +428,7 @@
 	let allRows = [];
 	let duelOnlyMode = false;
 	let groupByYear = true;
+	let includeFriendly = true;
 
 	function normalizeCountry(country) {
 	  if (country === "RCP") {
@@ -444,6 +449,7 @@
 	  let filteredRows;
 
 	  groupByYear = document.getElementById("groupByYear").checked;
+	  includeFriendly = document.getElementById("includeFriendly").checked;
 
 	  if (player && !onlyPlayerDuels) {
 		const matchingMatchKeys = new Set(
@@ -456,7 +462,10 @@
 				row.hu_player.toLowerCase().includes(player) ||
 				row.opp_player.toLowerCase().includes(player);
 
-			  return opponentOk && playerOk;
+			  const competitionOk =
+				includeFriendly || row.competition !== "-";
+
+			  return opponentOk && playerOk && competitionOk;
 			})
 			.map(row => `${row.year}-${row.match_no}`)
 		);
@@ -467,7 +476,10 @@
 		  const opponentOk =
 			!opponent || normalizeCountry(row.opponent) === opponent;
 
-		  return opponentOk && matchingMatchKeys.has(matchKey);
+		  const competitionOk =
+			includeFriendly || row.competition !== "-";
+
+		  return opponentOk && matchingMatchKeys.has(matchKey) && competitionOk;
 		});
 
 	  } else {
@@ -480,7 +492,10 @@
 			row.hu_player.toLowerCase().includes(player) ||
 			row.opp_player.toLowerCase().includes(player);
 
-		  return opponentOk && playerOk;
+		  const competitionOk =
+			includeFriendly || row.competition !== "-";
+
+		  return opponentOk && playerOk && competitionOk;
 		});
 	  }
 
@@ -526,6 +541,11 @@
 
 	  document.getElementById("groupByYear").addEventListener("change", e => {
 	    groupByYear = e.target.checked;
+	    applyFilters();
+	  });
+
+	  document.getElementById("includeFriendly").addEventListener("change", e => {
+	    includeFriendly = e.target.checked;
 	    applyFilters();
 	  });
 
