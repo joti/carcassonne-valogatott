@@ -1411,6 +1411,27 @@
 
 	  return card;
 	}
+
+	function createShowMoreButton() {
+	  const button = document.createElement("button");
+	  button.className = "show-more-button";
+	  button.textContent = "További mérkőzések";
+
+	  button.addEventListener("click", () => {
+		app.querySelectorAll(".hidden-mobile-card").forEach(card => {
+		  card.classList.remove("hidden-mobile-card");
+		});
+
+		app.querySelectorAll(".hidden-mobile-year").forEach(year => {
+		  year.classList.remove("hidden-mobile-year");
+		});
+
+		button.remove();
+	  });
+
+	  return button;
+	}
+
 	
 	function renderMatchCards(matches, matchesDiv, startIndex = 0) {
 	  let showMoreButton = null;
@@ -1478,26 +1499,6 @@
 	  }
 	}
 
-	function createShowMoreButton() {
-	  const button = document.createElement("button");
-	  button.className = "show-more-button";
-	  button.textContent = "További mérkőzések";
-
-	  button.addEventListener("click", () => {
-		app.querySelectorAll(".hidden-mobile-card").forEach(card => {
-		  card.classList.remove("hidden-mobile-card");
-		});
-
-		app.querySelectorAll(".hidden-mobile-year").forEach(year => {
-		  year.classList.remove("hidden-mobile-year");
-		});
-
-		button.remove();
-	  });
-
-	  return button;
-	}
-
 	function render(years) {
 	  app.innerHTML = "";
 
@@ -1513,12 +1514,71 @@
 		const matches = Object.values(years[year])
 		  .sort((a, b) => Number(b.match_no) - Number(a.match_no));
 
-		// itt maradjon a mostani éves statisztika számításod változatlanul
+		const wins = matches.filter(m => m.match_hu > m.match_opp).length;
+		const losses = matches.filter(m => m.match_hu < m.match_opp).length;
+		const draws = matches.filter(m => m.match_hu === m.match_opp).length;
 
-		const startIndex = renderedCardCount;
+		const duelWins = matches.reduce((sum, m) =>
+		  sum + m.duels.filter(d => d.hu_score > d.opp_score).length, 0
+		);
+
+		const duelCount = matches.reduce((sum, m) => sum + m.duels.length, 0);
+
+		const duelWinRate = duelCount
+		  ? Math.round((duelWins / duelCount) * 100)
+		  : 0;
+
+		const matchTextParts = [
+		  `${matches.length} mérkőzés`,
+		  `${wins} győzelem`,
+		  `${losses} vereség`
+		];
+
+		if (draws > 0) {
+		  matchTextParts.push(`${draws} döntetlen`);
+		}
+
+		const gameWins = matches.reduce((sum, m) =>
+		  sum + m.duels.reduce((s, d) => s + d.hu_score, 0), 0
+		);
+
+		const gameLosses = matches.reduce((sum, m) =>
+		  sum + m.duels.reduce((s, d) => s + d.opp_score, 0), 0
+		);
+
+		const gameCount = gameWins + gameLosses;
+
+		const gameWinRate = gameCount
+		  ? Math.round((gameWins / gameCount) * 100)
+		  : 0;
+
+		yearBlock.innerHTML = `
+		  <div class="year-header">
+			<div class="year">${year}</div>
+
+			<div class="year-summary">
+			  <div class="year-summary-line">
+				<i data-lucide="trophy" class="stat-icon match-icon"></i>
+				<span>${matchTextParts.join(" · ")}</span>
+			  </div>
+
+			  <div class="year-summary-line">
+				<i data-lucide="swords" class="stat-icon duel-icon"></i>
+				<span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
+			  </div>
+
+			  <div class="year-summary-line">
+				<i data-lucide="chart-column" class="stat-icon game-icon"></i>
+				<span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
+			  </div>
+			</div>
+		  </div>
+		`;
 
 		const matchesDiv = document.createElement("div");
 		matchesDiv.className = "matches";
+
+		const startIndex = renderedCardCount;
 
 		renderMatchCards(matches, matchesDiv, startIndex);
 
