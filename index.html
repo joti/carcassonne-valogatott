@@ -2,7 +2,8 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>Magyar Carcassonne válogatott</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Magyar Carcassonne válogatott mérkőzései</title>
   <style>
     body {
       font-family: "Frank Ruhl Libre", Arial, sans-serif;
@@ -437,6 +438,48 @@
 	.duel-link:hover {
 	  opacity: 0.7;
 	}	
+	
+	.hidden-mobile-card {
+	  display: none;
+	}
+	
+	.hidden-mobile-year {
+	  display: none;
+	}	
+
+	.show-more-button {
+	  margin: 14px auto 24px;
+	  padding: 9px 14px;
+	  border: 1px solid #d1d5db;
+	  border-radius: 999px;
+	  background: white;
+	  cursor: pointer;
+	  font-family: "Frank Ruhl Libre", Arial, sans-serif;
+	  font-size: 15px;
+	  color: #4b5563;
+	  display: block;
+	}
+
+	.show-more-button:hover {
+	  background: #f3f4f6;
+	}	
+
+	@media (max-width: 700px) {
+	  .matches {
+		grid-template-columns: 1fr;
+		padding-left: 10%;
+		padding-right: 10%;
+	  }
+
+	  .card {
+		width: 94%;
+	  }
+
+	  .show-more-button {
+		width: fit-content;
+	  }
+	}
+
   </style>
 </head>
 <body>
@@ -477,6 +520,12 @@
 	let duelOnlyMode = false;
 	let groupByYear = true;
 	let includeFriendly = true;
+
+	const MOBILE_CARD_LIMIT = 20;
+
+	function isMobileView() {
+	  return window.innerWidth <= 700;
+	}
 
 	function normalizeCountry(country) {
 	  if (country === "RCP") {
@@ -789,231 +838,231 @@
       return code;
 	}
 
-function countryContinent(country) {
+	function countryContinent(country) {
 
-  const continents = {
+	  const continents = {
 
-    "Afganisztán": "Ázsia",
-    "Albánia": "Európa",
-    "Algéria": "Afrika",
-    "Andorra": "Európa",
-    "Angola": "Afrika",
-    "Antigua és Barbuda": "Amerika",
-    "Argentína": "Amerika",
-    "Ausztrália": "Ázsia", // Ausztrália részt vesz az Ázsia Kupán
-    "Ausztria": "Európa",
-    "Azerbajdzsán": "Európa",
+		"Afganisztán": "Ázsia",
+		"Albánia": "Európa",
+		"Algéria": "Afrika",
+		"Andorra": "Európa",
+		"Angola": "Afrika",
+		"Antigua és Barbuda": "Amerika",
+		"Argentína": "Amerika",
+		"Ausztrália": "Ázsia", // Ausztrália részt vesz az Ázsia Kupán
+		"Ausztria": "Európa",
+		"Azerbajdzsán": "Európa",
 
-    "Bahama-szigetek": "Amerika",
-    "Bahrein": "Ázsia",
-    "Banglades": "Ázsia",
-    "Barbados": "Amerika",
-    "Belgium": "Európa",
-    "Belize": "Amerika",
-    "Benin": "Afrika",
-    "Bhután": "Ázsia",
-    "Bissau-Guinea": "Afrika",
-    "Bolívia": "Amerika",
-    "Bosznia-Hercegovina": "Európa",
-    "Botswana": "Afrika",
-    "Brazília": "Amerika",
-    "Brunei": "Ázsia",
-    "Bulgária": "Európa",
-    "Burkina Faso": "Afrika",
-    "Burundi": "Afrika",
+		"Bahama-szigetek": "Amerika",
+		"Bahrein": "Ázsia",
+		"Banglades": "Ázsia",
+		"Barbados": "Amerika",
+		"Belgium": "Európa",
+		"Belize": "Amerika",
+		"Benin": "Afrika",
+		"Bhután": "Ázsia",
+		"Bissau-Guinea": "Afrika",
+		"Bolívia": "Amerika",
+		"Bosznia-Hercegovina": "Európa",
+		"Botswana": "Afrika",
+		"Brazília": "Amerika",
+		"Brunei": "Ázsia",
+		"Bulgária": "Európa",
+		"Burkina Faso": "Afrika",
+		"Burundi": "Afrika",
 
-    "Chile": "Amerika",
-    "Ciprus": "Európa",
-    "Costa Rica": "Amerika",
-    "Comore-szigetek": "Afrika",
-    "Csád": "Afrika",
-    "Csehország": "Európa",
+		"Chile": "Amerika",
+		"Ciprus": "Európa",
+		"Costa Rica": "Amerika",
+		"Comore-szigetek": "Afrika",
+		"Csád": "Afrika",
+		"Csehország": "Európa",
 
-    "Dánia": "Európa",
-    "Dél-afrikai Köztársaság": "Afrika",
-    "Dél-Korea": "Ázsia",
-    "Dél-Szudán": "Afrika",
-    "Dominika": "Amerika",
-    "Dominikai Köztársaság": "Amerika",
-    "Dzsibuti": "Afrika",
+		"Dánia": "Európa",
+		"Dél-afrikai Köztársaság": "Afrika",
+		"Dél-Korea": "Ázsia",
+		"Dél-Szudán": "Afrika",
+		"Dominika": "Amerika",
+		"Dominikai Köztársaság": "Amerika",
+		"Dzsibuti": "Afrika",
 
-    "Ecuador": "Amerika",
-    "Egyenlítői-Guinea": "Afrika",
-    "Egyesült Arab Emírségek": "Ázsia",
-    "Egyesült Államok": "Amerika",
-    "Egyesült Királyság": "Európa",
-    "Egyiptom": "Afrika",
-    "Elefántcsontpart": "Afrika",
-    "Eritrea": "Afrika",
-    "Észtország": "Európa",
-    "Eswatini": "Afrika",
-    "Etiópia": "Afrika",
+		"Ecuador": "Amerika",
+		"Egyenlítői-Guinea": "Afrika",
+		"Egyesült Arab Emírségek": "Ázsia",
+		"Egyesült Államok": "Amerika",
+		"Egyesült Királyság": "Európa",
+		"Egyiptom": "Afrika",
+		"Elefántcsontpart": "Afrika",
+		"Eritrea": "Afrika",
+		"Észtország": "Európa",
+		"Eswatini": "Afrika",
+		"Etiópia": "Afrika",
 
-    "Fehéroroszország": "Európa",
-    "Fidzsi": "Óceánia",
-    "Finnország": "Európa",
-    "Franciaország": "Európa",
-    "Fülöp-szigetek": "Ázsia",
+		"Fehéroroszország": "Európa",
+		"Fidzsi": "Óceánia",
+		"Finnország": "Európa",
+		"Franciaország": "Európa",
+		"Fülöp-szigetek": "Ázsia",
 
-    "Gabon": "Afrika",
-    "Gambia": "Afrika",
-    "Ghána": "Afrika",
-    "Görögország": "Európa",
-    "Grenada": "Amerika",
-    "Grúzia": "Európa",
-    "Guatemala": "Amerika",
-    "Guinea": "Afrika",
-    "Guyana": "Amerika",
+		"Gabon": "Afrika",
+		"Gambia": "Afrika",
+		"Ghána": "Afrika",
+		"Görögország": "Európa",
+		"Grenada": "Amerika",
+		"Grúzia": "Európa",
+		"Guatemala": "Amerika",
+		"Guinea": "Afrika",
+		"Guyana": "Amerika",
 
-    "Haiti": "Amerika",
-    "Hollandia": "Európa",
-    "Honduras": "Amerika",
-    "Hongkong": "Ázsia",
-    "Horvátország": "Európa",
+		"Haiti": "Amerika",
+		"Hollandia": "Európa",
+		"Honduras": "Amerika",
+		"Hongkong": "Ázsia",
+		"Horvátország": "Európa",
 
-    "India": "Ázsia",
-    "Indonézia": "Ázsia",
-    "Irak": "Ázsia",
-    "Irán": "Ázsia",
-    "Írország": "Európa",
-    "Izland": "Európa",
-    "Izrael": "Ázsia",
+		"India": "Ázsia",
+		"Indonézia": "Ázsia",
+		"Irak": "Ázsia",
+		"Irán": "Ázsia",
+		"Írország": "Európa",
+		"Izland": "Európa",
+		"Izrael": "Ázsia",
 
-    "Jamaica": "Amerika",
-    "Japán": "Ázsia",
-    "Jemen": "Ázsia",
-    "Jordánia": "Ázsia",
+		"Jamaica": "Amerika",
+		"Japán": "Ázsia",
+		"Jemen": "Ázsia",
+		"Jordánia": "Ázsia",
 
-    "Kambodzsa": "Ázsia",
-    "Kamerun": "Afrika",
-    "Kanada": "Amerika",
-    "Katalónia": "Európa",
-    "Katar": "Ázsia",
-    "Kazahsztán": "Ázsia",
-    "Kelet-Timor": "Ázsia",
-    "Kenya": "Afrika",
-    "Kína": "Ázsia",
-    "Kirgizisztán": "Ázsia",
-    "Kiribati": "Óceánia",
-    "Kolumbia": "Amerika",
-    "Kongói Demokratikus Köztársaság": "Afrika",
-    "Közép-afrikai Köztársaság": "Afrika",
-    "Kuba": "Amerika",
-    "Kuvait": "Ázsia",
+		"Kambodzsa": "Ázsia",
+		"Kamerun": "Afrika",
+		"Kanada": "Amerika",
+		"Katalónia": "Európa",
+		"Katar": "Ázsia",
+		"Kazahsztán": "Ázsia",
+		"Kelet-Timor": "Ázsia",
+		"Kenya": "Afrika",
+		"Kína": "Ázsia",
+		"Kirgizisztán": "Ázsia",
+		"Kiribati": "Óceánia",
+		"Kolumbia": "Amerika",
+		"Kongói Demokratikus Köztársaság": "Afrika",
+		"Közép-afrikai Köztársaság": "Afrika",
+		"Kuba": "Amerika",
+		"Kuvait": "Ázsia",
 
-    "Laosz": "Ázsia",
-    "Lengyelország": "Európa",
-    "Lettország": "Európa",
-    "Libanon": "Ázsia",
-    "Libéria": "Afrika",
-    "Líbia": "Afrika",
-    "Liechtenstein": "Európa",
-    "Litvánia": "Európa",
-    "Luxemburg": "Európa",
+		"Laosz": "Ázsia",
+		"Lengyelország": "Európa",
+		"Lettország": "Európa",
+		"Libanon": "Ázsia",
+		"Libéria": "Afrika",
+		"Líbia": "Afrika",
+		"Liechtenstein": "Európa",
+		"Litvánia": "Európa",
+		"Luxemburg": "Európa",
 
-    "Madagaszkár": "Afrika",
-    "Magyarország": "Európa",
-    "Malajzia": "Ázsia",
-    "Malawi": "Afrika",
-    "Maldív-szigetek": "Ázsia",
-    "Mali": "Afrika",
-    "Málta": "Európa",
-    "Marokkó": "Afrika",
-    "Marshall-szigetek": "Óceánia",
-    "Mauritánia": "Afrika",
-    "Mauritius": "Afrika",
-    "Mexikó": "Amerika",
-    "Mianmar": "Ázsia",
-    "Mikronézia": "Óceánia",
-    "Moldova": "Európa",
-    "Monaco": "Európa",
-    "Mongólia": "Ázsia",
-    "Montenegró": "Európa",
-    "Mozambik": "Afrika",
+		"Madagaszkár": "Afrika",
+		"Magyarország": "Európa",
+		"Malajzia": "Ázsia",
+		"Malawi": "Afrika",
+		"Maldív-szigetek": "Ázsia",
+		"Mali": "Afrika",
+		"Málta": "Európa",
+		"Marokkó": "Afrika",
+		"Marshall-szigetek": "Óceánia",
+		"Mauritánia": "Afrika",
+		"Mauritius": "Afrika",
+		"Mexikó": "Amerika",
+		"Mianmar": "Ázsia",
+		"Mikronézia": "Óceánia",
+		"Moldova": "Európa",
+		"Monaco": "Európa",
+		"Mongólia": "Ázsia",
+		"Montenegró": "Európa",
+		"Mozambik": "Afrika",
 
-    "Namíbia": "Afrika",
-    "Nauru": "Óceánia",
-    "Nepál": "Ázsia",
-    "Nicaragua": "Amerika",
-    "Niger": "Afrika",
-    "Nigéria": "Afrika",
-    "Németország": "Európa",
-    "Norvégia": "Európa",
+		"Namíbia": "Afrika",
+		"Nauru": "Óceánia",
+		"Nepál": "Ázsia",
+		"Nicaragua": "Amerika",
+		"Niger": "Afrika",
+		"Nigéria": "Afrika",
+		"Németország": "Európa",
+		"Norvégia": "Európa",
 
-    "Olaszország": "Európa",
-    "Omán": "Ázsia",
-    "Oroszország": "Európa",
+		"Olaszország": "Európa",
+		"Omán": "Ázsia",
+		"Oroszország": "Európa",
 
-    "Örményország": "Európa",
+		"Örményország": "Európa",
 
-    "Pakisztán": "Ázsia",
-    "Palau": "Óceánia",
-    "Palesztina": "Ázsia",
-    "Panama": "Amerika",
-    "Pápua Új-Guinea": "Óceánia",
-    "Paraguay": "Amerika",
-    "Peru": "Amerika",
-    "Portugália": "Európa",
+		"Pakisztán": "Ázsia",
+		"Palau": "Óceánia",
+		"Palesztina": "Ázsia",
+		"Panama": "Amerika",
+		"Pápua Új-Guinea": "Óceánia",
+		"Paraguay": "Amerika",
+		"Peru": "Amerika",
+		"Portugália": "Európa",
 
-    "RCP": "Európa",
-    "Románia": "Európa",
-    "Ruanda": "Afrika",
+		"RCP": "Európa",
+		"Románia": "Európa",
+		"Ruanda": "Afrika",
 
-    "Saint Kitts és Nevis": "Amerika",
-    "Saint Lucia": "Amerika",
-    "Saint Vincent és a Grenadine-szigetek": "Amerika",
-    "Salamon-szigetek": "Óceánia",
-    "Salvador": "Amerika",
-    "San Marino": "Európa",
-    "São Tomé és Príncipe": "Afrika",
-    "Spanyolország": "Európa",
-    "Srí Lanka": "Ázsia",
-    "Suriname": "Amerika",
-    "Svájc": "Európa",
-    "Svédország": "Európa",
-    "Szaúd-Arábia": "Ázsia",
-    "Szenegál": "Afrika",
-    "Szerbia": "Európa",
-    "Seychelle-szigetek": "Afrika",
-    "Sierra Leone": "Afrika",
-    "Szingapúr": "Ázsia",
-    "Szíria": "Ázsia",
-    "Szlovákia": "Európa",
-    "Szlovénia": "Európa",
-    "Szomália": "Afrika",
-    "Szudán": "Afrika",
+		"Saint Kitts és Nevis": "Amerika",
+		"Saint Lucia": "Amerika",
+		"Saint Vincent és a Grenadine-szigetek": "Amerika",
+		"Salamon-szigetek": "Óceánia",
+		"Salvador": "Amerika",
+		"San Marino": "Európa",
+		"São Tomé és Príncipe": "Afrika",
+		"Spanyolország": "Európa",
+		"Srí Lanka": "Ázsia",
+		"Suriname": "Amerika",
+		"Svájc": "Európa",
+		"Svédország": "Európa",
+		"Szaúd-Arábia": "Ázsia",
+		"Szenegál": "Afrika",
+		"Szerbia": "Európa",
+		"Seychelle-szigetek": "Afrika",
+		"Sierra Leone": "Afrika",
+		"Szingapúr": "Ázsia",
+		"Szíria": "Ázsia",
+		"Szlovákia": "Európa",
+		"Szlovénia": "Európa",
+		"Szomália": "Afrika",
+		"Szudán": "Afrika",
 
-    "Tádzsikisztán": "Ázsia",
-    "Tajvan": "Ázsia",
-    "Tanzánia": "Afrika",
-    "Thaiföld": "Ázsia",
-    "Togo": "Afrika",
-    "Tonga": "Óceánia",
-    "Trinidad és Tobago": "Amerika",
-    "Tunézia": "Afrika",
-    "Tutejšyja": "Európa",
-    "Törökország": "Ázsia",
-    "Türkmenisztán": "Ázsia",
-    "Tuvalu": "Óceánia",
+		"Tádzsikisztán": "Ázsia",
+		"Tajvan": "Ázsia",
+		"Tanzánia": "Afrika",
+		"Thaiföld": "Ázsia",
+		"Togo": "Afrika",
+		"Tonga": "Óceánia",
+		"Trinidad és Tobago": "Amerika",
+		"Tunézia": "Afrika",
+		"Tutejšyja": "Európa",
+		"Törökország": "Ázsia",
+		"Türkmenisztán": "Ázsia",
+		"Tuvalu": "Óceánia",
 
-    "Uganda": "Afrika",
-    "Ukrajna": "Európa",
-    "Uruguay": "Amerika",
-    "Új-Zéland": "Óceánia",
-    "Üzbegisztán": "Ázsia",
+		"Uganda": "Afrika",
+		"Ukrajna": "Európa",
+		"Uruguay": "Amerika",
+		"Új-Zéland": "Óceánia",
+		"Üzbegisztán": "Ázsia",
 
-    "Vanuatu": "Óceánia",
-    "Vatikán": "Európa",
-    "Venezuela": "Amerika",
-    "Vietnam": "Ázsia",
+		"Vanuatu": "Óceánia",
+		"Vatikán": "Európa",
+		"Venezuela": "Amerika",
+		"Vietnam": "Ázsia",
 
-    "Zambia": "Afrika",
-    "Zimbabwe": "Afrika",
-    "Zöld-foki Köztársaság": "Afrika",
-  };
+		"Zambia": "Afrika",
+		"Zimbabwe": "Afrika",
+		"Zöld-foki Köztársaság": "Afrika",
+	  };
 
-  return continents[country] || "Ismeretlen";
-}
+	  return continents[country] || "Ismeretlen";
+	}
 
 	function countryFlag(country) {
 
@@ -1362,6 +1411,42 @@ function countryContinent(country) {
 
 	  return card;
 	}
+	
+	function renderMatchCards(matches, matchesDiv, startIndex = 0) {
+	  let showMoreButton = null;
+
+	  matches.forEach((match, index) => {
+		const globalIndex = startIndex + index;
+		const card = renderMatchCard(match);
+
+		if (isMobileView() && globalIndex >= MOBILE_CARD_LIMIT) {
+		  card.classList.add("hidden-mobile-card");
+		}
+
+		matchesDiv.appendChild(card);
+	  });
+
+	  if (isMobileView() && startIndex < MOBILE_CARD_LIMIT && startIndex + matches.length > MOBILE_CARD_LIMIT) {
+		showMoreButton = document.createElement("button");
+		showMoreButton.className = "show-more-button";
+		showMoreButton.textContent = "További mérkőzések";
+
+		showMoreButton.addEventListener("click", () => {
+		  app.querySelectorAll(".hidden-mobile-card").forEach(card => {
+			card.classList.remove("hidden-mobile-card");
+		  });
+
+		  app.querySelectorAll(".hidden-mobile-year").forEach(year => {
+			year.classList.remove("hidden-mobile-year");
+		  });
+
+		  showMoreButton.remove();
+		});
+
+	  }
+
+	  return showMoreButton;
+	}
 
 	function renderWithoutYears(rows) {
 
@@ -1380,19 +1465,24 @@ function countryContinent(country) {
 	  const matchesDiv = document.createElement("div");
 	  matchesDiv.className = "matches";
 
-	  matches.forEach(match => {
-		matchesDiv.appendChild(renderMatchCard(match));
-	  });
+	  const showMoreButton = renderMatchCards(matches, matchesDiv);
 
-	  app.appendChild(matchesDiv);
+  	  app.appendChild(matchesDiv);
+
+	  if (showMoreButton) {
+	    app.appendChild(showMoreButton);
+	  }
 
 	  if (window.lucide) {
 		lucide.createIcons();
 	  }
 	}
 
-    function render(years) {
-      app.innerHTML = "";
+	function render(years) {
+	  app.innerHTML = "";
+
+	  let renderedCardCount = 0;
+	  let globalShowMoreButtonAdded = false;
 
 	  Object.keys(years).sort((a, b) => b - a).forEach((year, index) => {
 		const yearBlock = document.createElement("section");
@@ -1410,22 +1500,7 @@ function countryContinent(country) {
 		);
 
 		const duelCount = matches.reduce((sum, m) => sum + m.duels.length, 0);
-
-		const duelWinRate = duelCount
-		  ? Math.round((duelWins / duelCount) * 100)
-		  : 0;
-
-		const stats = [
-		  `${matches.length} mérkőzés`,
-		  `${wins} győzelem`,
-		  `${losses} vereség`
-		];
-
-		if (draws > 0) {
-		  stats.push(`${draws} döntetlen`);
-		}
-
-		stats.push(`${duelWinRate}% párharcgyőzelem`);
+		const duelWinRate = duelCount ? Math.round((duelWins / duelCount) * 100) : 0;
 
 		const matchTextParts = [
 		  `${matches.length} mérkőzés`,
@@ -1446,51 +1521,63 @@ function countryContinent(country) {
 		);
 
 		const gameCount = gameWins + gameLosses;
-
-		const gameWinRate = gameCount
-		  ? Math.round((gameWins / gameCount) * 100)
-		  : 0;
+		const gameWinRate = gameCount ? Math.round((gameWins / gameCount) * 100) : 0;
 
 		yearBlock.innerHTML = `
 		  <div class="year-header">
-		    <div class="year">${year}</div>
+			<div class="year">${year}</div>
 
-		    <div class="year-summary">
+			<div class="year-summary">
 			  <div class="year-summary-line">
-			    <i data-lucide="trophy" class="stat-icon match-icon"></i>
-			    <span>${matchTextParts.join(" · ")}</span>
+				<i data-lucide="trophy" class="stat-icon match-icon"></i>
+				<span>${matchTextParts.join(" · ")}</span>
 			  </div>
 
 			  <div class="year-summary-line">
-			    <i data-lucide="swords" class="stat-icon duel-icon"></i>
-			    <span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
+				<i data-lucide="swords" class="stat-icon duel-icon"></i>
+				<span>${duelCount} párharc · ${duelWins} győzelem (${duelWinRate}%)</span>
 			  </div>
 
 			  <div class="year-summary-line">
-			    <i data-lucide="chart-column" class="stat-icon game-icon"></i>
-			    <span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
+				<i data-lucide="chart-column" class="stat-icon game-icon"></i>
+				<span>${gameCount} játszma · ${gameWins} győzelem (${gameWinRate}%)</span>
 			  </div>
-	  	    </div>
+			</div>
 		  </div>
-
 		`;
 
-        const matchesDiv = document.createElement("div");
-        matchesDiv.className = "matches";
+		const matchesDiv = document.createElement("div");
+		matchesDiv.className = "matches";
 
-        matches.forEach(match => {
-		  matchesDiv.appendChild(renderMatchCard(match));
-        });
+		const startIndex = renderedCardCount;
 
-        yearBlock.appendChild(matchesDiv);
-        app.appendChild(yearBlock);
+		const showMoreButton = renderMatchCards(
+		  matches,
+		  matchesDiv,
+		  startIndex
+		);
+
+		renderedCardCount += matches.length;
+
+		if (isMobileView() && startIndex >= MOBILE_CARD_LIMIT) {
+		  yearBlock.classList.add("hidden-mobile-year");
+		}
 		
-		if (window.lucide) {
-		  lucide.createIcons();
-		}		
-		
-      });
-    }
+		yearBlock.appendChild(matchesDiv);
+
+		if (showMoreButton && !globalShowMoreButtonAdded) {
+		  yearBlock.appendChild(showMoreButton);
+		  globalShowMoreButtonAdded = true;
+		}
+
+		app.appendChild(yearBlock);
+	  });
+
+	  if (window.lucide) {
+		lucide.createIcons();
+	  }
+	}
+
 
     window.handleSheetData = function(response) {
       try {
