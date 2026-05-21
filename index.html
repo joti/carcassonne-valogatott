@@ -1371,21 +1371,27 @@
 	  const streamLinks = [match.stream_link_1, match.stream_link_2]
 		  .filter(link => link && link.trim() !== "");
 
-  	  const streamIconsHtml = streamLinks.length
+	  const streamIconsHtml = streamLinks.length
 		  ? `
 			<div class="stream-icons">
-			  ${streamLinks.map((link, index) => `
-				<a href="${link}"
-				   target="_blank"
-				   class="stream-link"
-				   title="${index + 1}. közvetítés megnyitása">
-				  <i data-lucide="play"></i>
-				</a>
-			  `).join("")}
+			  ${streamLinks.map((link, index) => {
+				const tooltip =
+				  streamLinks.length === 1
+					? "Közvetítés megnyitása"
+					: `${index + 1}. közvetítés megnyitása`;
+
+				return `
+				  <a href="${link}"
+					 target="_blank"
+					 class="stream-link"
+					 title="${tooltip}">
+					<i data-lucide="play"></i>
+				  </a>
+				`;
+			  }).join("")}
 			</div>
 		  `
 		  : "";
-
 
 	  card.innerHTML = `
 		${streamIconsHtml}
